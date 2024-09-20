@@ -1,0 +1,59 @@
+# Creat a deployment with 4 replicas
+
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: my-website
+spec: 
+  replicas: 4
+  selector: 
+    matchLabels: 
+      app: my-website
+  template: 
+    metadata:
+      labels:
+        app: my-website
+    spec: 
+      containers: 
+      - name: my-website
+        image: youssefshawky/project-1:latest
+        ports: 
+        - containerPort: 80
+
+---
+
+# Exposing the deployment
+
+apiVersion: v1
+kind: Service
+metadata: 
+  name: my-website
+spec: 
+  selector:
+    app: my-website
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+  type: ClusterIP
+
+---
+# Set the ingress and expose the front end service to mapped to the backend service
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata: 
+  name: my-website-ingress
+spec: 
+  rules:
+    - host: mywebsite.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: my-website
+                port:
+                  number: 80
+
